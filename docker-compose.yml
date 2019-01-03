@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    container_name: psql_teonite_new
+    environment:
+      POSTGRES_DB: teonite_task_new
+      POSTGRES_USER: teonite
+      POSTGRES_PASSWORD: teonite
+    ports:
+      - 5432:5432
+
+  web:
+    build: .
+    command: python3 manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/code
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - init
+
+  init:
+    build: .
+    container_name: data_acquisition
+    volumes:
+      - .:/code
+    entrypoint: sh /code/start.sh
+    depends_on:
+      - db
